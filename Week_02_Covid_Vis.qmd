@@ -1,7 +1,7 @@
 ---
 title: "Week 02: COVID Visualization Activity"
 date: "September, 11 2023"
-author: "**`[[`**Your Name**`]]`**"
+author: "Hanwen Miao"
 ---
 
 Today, we'll be working with a data set related to COVID.
@@ -13,6 +13,7 @@ Note, due to differences in the way race and ethnicity are encoded in the census
 library(tidyverse)
 load("CRDT Data.RData")
 ls()
+write.csv(covid_data_race, "covid_data_race.csv", row.names=FALSE)
 ```
 
 I've include 4 different data sets.
@@ -39,3 +40,41 @@ covid_data_count |>
 2. Are there any conclusions you can draw?
 3. What were you not able to do due to not having the R knowledge?
 4. What other data would be useful to better understand this data?
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Read the CSV file
+covid_data_race <- read.csv("covid_data_race.csv")
+
+# Filter for 'Cases' count type
+cases_data <- subset(covid_data_race, count_type == "Cases")
+
+# Summing counts by racial groups and removing NA values
+racial_counts <- colSums(cases_data[,c("White_count", "Black_count", "Asian_count", 
+                                       "AIAN_count", "NHPI_count", 
+                                       "Multiracial_count", "Other_count")], na.rm = TRUE)
+
+# Filter out non-finite values
+racial_counts <- racial_counts[is.finite(racial_counts)]
+
+# Rename the labels
+names(racial_counts) <- c("White", "Black", "Asian", "AIAN", "NHPI", "Multiracial", "Other")
+
+# Plot
+racial_counts <- sort(racial_counts)
+barplot(racial_counts, horiz = TRUE, las = 1, col = "blue",
+        main = "Total COVID-19 Cases by Racial Group",
+        xlab = "Total Cases",
+        ylab = "Racial Group",
+        border = "white",
+        cex.names = 0.8)
+```
+Observations:
+The White racial group has the highest number of reported COVID-19 cases, followed by the Black racial group. Asian, AIAN (American Indian/Alaska Native), and Multiracial groups have comparatively lower numbers of reported cases. The NHPI (Native Hawaiian and Other Pacific Islander) and Other racial groups have the least number of reported cases.
+Conclusions:
+There is a marked disparity in reported COVID-19 cases across different racial groups. The reasons for this disparity could be population distribution, social determinants of health, access to healthcare, and more. Addressing racial disparities in health outcomes would be essential. 
+Limitation:
+The data represents raw counts, and while population proportions have been provided, this analysis did not normalize the case counts by population. This normalization would provide a more accurate representation of case rates per capita across racial groups.
+Socioeconomic data, such as income levels, housing density, and occupation types, could provide insights into why certain racial groups might be more exposed or vulnerable.
+
